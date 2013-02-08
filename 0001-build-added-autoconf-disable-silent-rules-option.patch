@@ -1,0 +1,30 @@
+From 6af702bdc9ea36a1f33232a818a819afde9bc4d2 Mon Sep 17 00:00:00 2001
+From: Sumit Bose <sbose@redhat.com>
+Date: Thu, 6 Oct 2011 10:32:58 +0200
+Subject: [PATCH] build: added autoconf --disable-silent-rules option
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Günther Deschner <gd@samba.org>
+---
+ buildtools/wafsamba/wscript |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/buildtools/wafsamba/wscript b/buildtools/wafsamba/wscript
+index 1a7f3eb69974625e903f314c6c7b92547063e884..5c5e249758c36a64083499b9050c0c4e77c87b6d 100755
+--- a/buildtools/wafsamba/wscript
++++ b/buildtools/wafsamba/wscript
+@@ -162,6 +162,9 @@ def set_options(opt):
+     opt.add_option('--disable-dependency-tracking',
+ 		   help=SUPPRESS_HELP,
+ 		   action='store_true', dest='AUTOCONF_DISABLE_DEPENDENCY_TRACKING', default=False)
++    opt.add_option('--disable-silent-rules',
++		   help=SUPPRESS_HELP,
++		   action='store_true', dest='AUTOCONF_DISABLE_SILENT_RULES', default=False)
+ 
+     gr = opt.option_group('dist options')
+     gr.add_option('--sign-release',
+-- 
+1.7.7.3
+
