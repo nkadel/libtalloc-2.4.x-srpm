@@ -5,8 +5,8 @@
 %{!?python_version: %global python_version %(%{__python} -c "from distutils.sysconfig import get_python_version; print(get_python_version())")}
 
 Name: libtalloc
-Version: 2.0.7
-Release: 5%{?dist}
+Version: 2.0.8
+Release: 1%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -23,7 +23,6 @@ BuildRequires: doxygen
 Provides: bundled(libreplace)
 
 # Patches
-Patch1001: 0001-build-added-autoconf-disable-silent-rules-option.patch
 
 
 %description
@@ -56,8 +55,6 @@ Development libraries for pytalloc
 
 %prep
 %setup -q -n talloc-%{version}
-
-%patch1001 -p1
 
 %build
 %configure --disable-rpath \
@@ -97,6 +94,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libtalloc.so
 %{_libdir}/pkgconfig/talloc.pc
 %{_mandir}/man3/talloc*.3.gz
+%{_mandir}/man3/libtalloc*.3.gz
 
 %files -n pytalloc
 %defattr(-,root,root,-)
@@ -117,6 +115,9 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n pytalloc -p /sbin/ldconfig
 
 %changelog
+* Sat Dec 01 2012 Jakub Hrozek <jhrozek@redhat.com> - 2.0.8-1
+- New upstream release
+
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.7-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
