@@ -6,7 +6,7 @@
 
 Name: libtalloc
 Version: 2.0.8
-Release: 1%{?dist}
+Release: 0.2%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -20,10 +20,7 @@ BuildRequires: docbook-style-xsl
 BuildRequires: python-devel
 BuildRequires: doxygen
 
-Provides: bundled(libreplace)
-
 # Patches
-
 
 %description
 A library that implements a hierarchical allocator with destructors.
@@ -40,6 +37,7 @@ Header files needed to develop programs that link against the Talloc library.
 Group: Development/Libraries
 Summary: Developer tools for the Talloc library
 Requires: libtalloc = %{version}-%{release}
+Obsoletes: pytalloc < %{version}-%{release}
 
 %description -n pytalloc
 Pytalloc libraries for creating python bindings using talloc
@@ -48,10 +46,10 @@ Pytalloc libraries for creating python bindings using talloc
 Group: Development/Libraries
 Summary: Developer tools for the Talloc library
 Requires: pytalloc = %{version}-%{release}
+Obsoletes: pytalloc-devel < %{version}-%{release}
 
 %description -n pytalloc-devel
 Development libraries for pytalloc
-
 
 %prep
 %setup -q -n talloc-%{version}
@@ -107,64 +105,30 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/pytalloc-util.pc
 %{_libdir}/libpytalloc-util.so
 
-%post -p /sbin/ldconfig
+%post
+/sbin/ldconfig
 
-%postun -p /sbin/ldconfig
+%postun
+/sbin/ldconfig
 
 %post -n pytalloc -p /sbin/ldconfig
 %postun -n pytalloc -p /sbin/ldconfig
 
 %changelog
-* Sat Dec 01 2012 Jakub Hrozek <jhrozek@redhat.com> - 2.0.8-1
-- New upstream release
+* Thu Feb 21 2013 Nico Kadel-Garcia <nkadel@gmail.com> - 2.0.8-0.2
+- Update to 2.0.8 for Samba 4.0.3
+- Discard unneeded autoconf patch.
 
-* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.7-5
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+* Mon Oct  8 2012 Jakub Hrozek <jhrozek@redhat.com> - 2.0.7-2
+- Obsolete older pytalloc{,-devel} releases to clear the upgrade path
+  towards non-multilib pytalloc
+- Resolves: rhbz#862062
 
-* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.7-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+* Thu Aug 2  2012 Jakub Hrozek <jhrozek@redhat.com> - 2.0.7-1
+- New upstream version, resolves rhbz #766335
+- Build python bindings to satisfy Samba4 BuildRequires
 
-* Thu Dec 01 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.7-3
-- Add patch to ignore --disable-silent-rules
-- Package API docs into libtalloc-devel
-
-* Wed Nov 23 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.7-2
-- Add explicit mention of the bundled libreplace
-- https://fedorahosted.org/fpc/ticket/120
-
-* Fri Nov 04 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.7-1
-- New upstream release
-- Required for new Samba 4 alpha builds
-
-* Mon Aug 08 2011 Simo Sorce <ssorce@redhat.com> - 2.0.6-1
-- New upstream release
-- Fixes various bugs with talloc_free_children and freeing complex
-  hierarchies with many siblinbgs.
-
-* Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2.0.5-8
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
-
-* Thu Jan 14 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.5-7
-- Let rpmbuild strip binaries, make build more verbose.
-- Resolves rhbz#669477 - libtalloc 2.0.5-6 binaries not stripped,
--                        empty -debuginfo
-- Original patch by Ville SkyttÃ¤ <ville.skytta@iki.fi>
-
-* Wed Jan 12 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.5-6
-- Install python bindings in the correct location
-
-* Tue Jan 11 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.5-5
-- Run ldconfig on pytalloc
-
-* Tue Jan 11 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.5-4
-- Fix build failure on 32-bit platforms
-
-* Tue Jan 11 2011 Stephen Gallagher <sgallagh@redhat.com> - 2.0.5-3
-- New version from upstream
-- Add support for pytalloc
-- Convert to new WAF build-system
-
-* Tue Dec 15 2009 Simo Sorce <ssorce@redhat.com> - 2.0.1-1
+* Tue Dec 15 2009 Simo Sorce <ssorce@redhat.com> - 2.0.1-1.1
 - New version from upstream
 - Also stop building the compat lib, it is not necessary anymore
 
