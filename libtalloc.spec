@@ -5,8 +5,8 @@
 %{!?python_version: %global python_version %(%{__python} -c "from distutils.sysconfig import get_python_version; print(get_python_version())")}
 
 Name: libtalloc
-Version: 2.0.8
-Release: 0.2%{?dist}
+Version: 2.1.0
+Release: 0.1%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -115,9 +115,12 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n pytalloc -p /sbin/ldconfig
 
 %changelog
+* Sat Sep 28 2013 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.0-0.1
+- Update to 2.1.0
+
 * Thu Feb 21 2013 Nico Kadel-Garcia <nkadel@gmail.com> - 2.0.8-0.2
 - Update to 2.0.8 for Samba 4.0.3
-- Discard unneeded autoconf patch.
+- Discard unneeded autoconf patch
 
 * Mon Oct  8 2012 Jakub Hrozek <jhrozek@redhat.com> - 2.0.7-2
 - Obsolete older pytalloc{,-devel} releases to clear the upgrade path
