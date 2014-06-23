@@ -115,7 +115,7 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n pytalloc -p /sbin/ldconfig
 
 %changelog
-* Mon Jun 23 2043 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.1-0.1
+* Mon Jun 23 2014 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.1-0.1
 - Update to 2.1.1
 
 * Sat Sep 28 2013 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.0-0.1
