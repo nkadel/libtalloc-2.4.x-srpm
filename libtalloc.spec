@@ -11,7 +11,7 @@ Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
 URL: http://talloc.samba.org/
-Source: http://samba.org/ftp/talloc/talloc-%{version}.tar.gz
+Source: http://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 
 BuildRequires: autoconf
