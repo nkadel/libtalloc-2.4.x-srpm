@@ -1,7 +1,7 @@
-libtalloc-2.1.1-srpm
+libtalloc-2.1.x-srpm
 ====================
 
-SRPM building tools for libtalloc-2.1.1, needed for Samba 4 on RHEL 6.
+SRPM building tools for libtalloc-2.1.x, needed for Samba 4 on RHEL 6.
 
 These are built from Fedora rawhide releases, and need to be built and
 installed in the following order.
