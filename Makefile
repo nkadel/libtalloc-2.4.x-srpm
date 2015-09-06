@@ -15,23 +15,24 @@ MOCKS+=samba4repo-f22-x86_64
 
 REPOBASEDIR=/var/www/linux/samba4repo
 
+SPEC := `ls *.spec`
 PKGNAME := "`ls *.spec | head -1 | sed 's/.spec$$//g'`"
 
 all:: verifyspec $(MOCKS)
 
 # Oddness to get deduced .spec file verified
 verifyspec:: FORCE
-	@if [ ! -e *.spec ]; then \
-	    echo Error: SPEC file *.spec not found, exiting; \
+	@if [ ! -e $(SPEC) ]; then \
+	    echo Error: SPEC file $(SPEC) not found, exiting; \
 	    exit 1; \
 	fi
 
 srpm:: verifyspec FORCE
-	@echo "Building SRPM with *.spec"
+	@echo "Building SRPM with $(SPEC)"
 	rm -rf rpmbuild
 	rpmbuild --define '_topdir $(PWD)/rpmbuild' \
 		--define '_sourcedir $(PWD)' \
-		-bs *.spec --nodeps
+		-bs $(SPEC) --nodeps
 
 build:: srpm FORCE
 	rpmbuild --define '_topdir $(PWD)/rpmbuild' \
@@ -41,11 +42,11 @@ $(MOCKS):: verifyspec FORCE
 	@if [ -e $@ -a -n "`find $@ -name \*.rpm`" ]; then \
 		echo "	Skipping RPM populated $@"; \
 	else \
-		echo "	Building $@ RPMS with *.spec"; \
+		echo "	Building $@ RPMS with $(SPEC)"; \
 		rm -rf $@; \
 		mock -q -r $@ --sources=$(PWD) \
 		    --resultdir=$(PWD)/$@ \
-		    --buildsrpm --spec=*.spec; \
+		    --buildsrpm --spec=$(SPEC); \
 		echo "Storing $@/*.src.rpm in $@.rpm"; \
 		/bin/mv $@/*.src.rpm $@.src.rpm; \
 		echo "Actally building RPMS in $@"; \
