@@ -5,7 +5,7 @@
 %{!?python_version: %global python_version %(%{__python} -c "from distutils.sysconfig import get_python_version; print(get_python_version())")}
 
 Name: libtalloc
-Version: 2.1.6
+Version: 2.1.7
 Release: 0.1%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
@@ -115,6 +115,9 @@ rm -rf $RPM_BUILD_ROOT
 %postun -n pytalloc -p /sbin/ldconfig
 
 %changelog
+* Fri Jun 17 2016 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.7-0.1
+- Update to 2.1.7
+
 * Sun Apr 10 2016 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.6-0.1
 - Update to 2.1.6
 
