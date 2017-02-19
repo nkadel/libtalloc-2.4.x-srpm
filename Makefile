@@ -5,10 +5,9 @@
 # Assure that sorting is case sensitive
 LANG=C
 
-MOCKS+=samba4repo-f25-x86_64
-#MOCKS+=samba4repo-7-x86_64
-# Give up on RHEL 6, too many upstream dependencies
-#MOCKS+=samba4repo-6-x86_64
+# f25 has a differently built libtalloc
+#MOCKS+=samba4repo-f25-x86_64
+MOCKS+=samba4repo-7-x86_64
 
 #REPOBASEDIR=/var/www/linux/samba4repo
 REPOBASEDIR:=`/bin/pwd`/../samba4repo
@@ -68,8 +67,8 @@ install:: $(MOCKS)
 		rsync -av $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
 		createrepo -q $$rpmdir/.; \
 	    done; \
-	    echo "Touching /etc/mock/$$repo.cfg to clear cache"; \
-	    sudo /bin/touch /etc/mock/$$repo.cfg; \
+	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
+	    /bin/touch $(PWD)/../$$repo.cfg; \
 	done
 
 clean::
