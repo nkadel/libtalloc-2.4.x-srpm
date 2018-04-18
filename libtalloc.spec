@@ -5,7 +5,7 @@
 %endif
 
 Name: libtalloc
-Version: 2.1.11
+Version: 2.1.13
 Release: 0.1%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
@@ -167,6 +167,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif
 
 %changelog
+* Wed Apr 18 17 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.13-0.1
+- Update to 2.1.13
+
 * Sat Mar 17 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.11-0.1
 - Update to 2.1.11
 
