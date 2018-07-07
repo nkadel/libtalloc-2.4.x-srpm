@@ -1,4 +1,4 @@
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel} > 7
 %global with_python3 1
 %else
 %global with_python3 0
@@ -6,13 +6,14 @@
 
 Name: libtalloc
 Version: 2.1.13
-Release: 0.1%{?dist}
+Release: 0%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
 Source: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
 
+BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
 BuildRequires: python2-devel
@@ -91,6 +92,9 @@ PY3_CONFIG_FLAGS=--extra-python=%{__python3}
 PY3_CONFIG_FLAGS=""
 %endif
 
+# workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1217376
+export python_LDFLAGS=""
+
 %configure --disable-rpath \
            --disable-rpath-install \
            --bundled-libraries=NONE \
@@ -154,24 +158,43 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_libdir}/libpytalloc-util.cpython*.so
 %endif
 
-%post -p /sbin/ldconfig
+%ldconfig_scriptlets
 
-%postun -p /sbin/ldconfig
-
-%post -n python2-talloc -p /sbin/ldconfig
-%postun -n python2-talloc -p /sbin/ldconfig
+%ldconfig_scriptlets -n python2-talloc
 
 %if 0%{?with_python3}
-%post -n python3-talloc -p /sbin/ldconfig
-%postun -n python3-talloc -p /sbin/ldconfig
+%ldconfig_scriptlets -n python3-talloc
 %endif
 
 %changelog
-* Wed Apr 18 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.13-0.1
-- Update to 2.1.13
+* Fri Apr 06 2018 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.13-1
+- rhbz#1564323 New upstream release - 2.1.13
 
-* Sat Mar 17 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.11-0.1
-- Update to 2.1.11
+* Thu Mar 22 2018 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.12-1
+- rhbz#1559378 New upstream release - 2.1.12
+
+* Fri Mar 02 2018 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.11-6
+- Disable link time optimisation for python3 related libs
+- Workaround for rhbz#1548823
+
+* Mon Feb 26 2018 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.11-5
+- Add gcc to Buildroot
+- https://fedoraproject.org/wiki/Changes/Remove_GCC_from_BuildRoot
+
+* Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.11-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+
+* Sat Feb 03 2018 Igor Gnatenko <ignatenkobrain@fedoraproject.org> - 2.1.11-3
+- Switch to %%ldconfig_scriptlets
+
+* Sat Jan 20 2018 Björn Esser <besser82@fedoraproject.org> - 2.1.11-2
+- Rebuilt for switch to libxcrypt
+
+* Sat Jan 13 2018 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.11-1
+- rhbz#1534136 New upstream release - 2.1.11
+
+* Wed Nov 29 2017 Merlin Mathesius <mmathesi@redhat.com> - 2.1.10-5
+- Cleanup spec file conditionals
 
 * Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.10-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
