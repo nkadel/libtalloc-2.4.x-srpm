@@ -5,8 +5,8 @@
 # Assure that sorting is case sensitive
 LANG=C
 
-MOCKS+=samba4repo-7-x86_64
 MOCKS+=samba4repo-f28-x86_64
+MOCKS+=samba4repo-7-x86_64
 
 #REPOBASEDIR=/var/www/linux/samba4repo
 REPOBASEDIR:=`/bin/pwd`/../samba4repo
@@ -56,16 +56,20 @@ mock:: $(MOCKS)
 install:: $(MOCKS)
 	@for repo in $(MOCKS); do \
 	    echo Installing $$repo; \
-	    echo "$$repo" | awk -F- '{print $$2,$$3}' | while read yumrelease yumarch; do \
-		rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
-		srpmdir=$(REPOBASEDIR)/$$yumrelease/SRPMS; \
-		echo "Pushing SRPMS to $$srpmdir"; \
-		rsync -av $$repo/*.src.rpm --no-owner --no-group $$repo/*.src.rpm $$srpmdir/. || exit 1; \
-		createrepo -q $$srpmdir/.; \
-		echo "Pushing RPMS to $$rpmdir"; \
-		rsync -av $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
-		createrepo -q $$rpmdir/.; \
-	    done; \
+	    case $$repo in \
+		*-7-x86_64) yumrelease=el/7; yumarch=x86_64; ;; \
+		*-28-x86_64) yumrelease=fedora/28; yumarch=x86_64; ;; \
+		*-f28-x86_64) yumrelease=fedora/28; yumarch=x86_64; ;; \
+		*) echo "Unrecognized relese for $$repo, exiting" >&2; exit 1; ;; \
+	    esac; \
+	    rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
+	    srpmdir=$(REPOBASEDIR)/$$yumrelease/SRPMS; \
+	    echo "Pushing SRPMS to $$srpmdir"; \
+	    rsync -av $$repo/*.src.rpm --no-owner --no-group $$repo/*.src.rpm $$srpmdir/. || exit 1; \
+	    createrepo -q --update $$srpmdir/.; \
+	    echo "Pushing RPMS to $$rpmdir"; \
+	    rsync -av $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
+	    createrepo -q --update $$rpmdir/.; \
 	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
 	    /bin/touch $(PWD)/../$$repo.cfg; \
 	done
