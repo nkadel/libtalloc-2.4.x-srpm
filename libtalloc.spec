@@ -5,7 +5,7 @@
 %endif
 
 Name: libtalloc
-Version: 2.1.13
+Version: 2.1.14
 Release: 0%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
@@ -95,6 +95,12 @@ PY3_CONFIG_FLAGS=""
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 export python_LDFLAGS=""
 
+%if 0%{?with_python3}
+pathfix.py -n -p -i %{__python2} buildtools/bin/waf
+%else
+sed -i 's|^#!/usr/bin/env python|#!%{__python2}|g' buildtools/bin/waf
+%endif
+
 %configure --disable-rpath \
            --disable-rpath-install \
            --bundled-libraries=NONE \
@@ -123,11 +129,9 @@ rm -f $RPM_BUILD_ROOT/usr/share/swig/*/talloc.i
 cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 
 %files
-%defattr(-,root,root,-)
 %{_libdir}/libtalloc.so.*
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/talloc.h
 %{_libdir}/libtalloc.so
 %{_libdir}/pkgconfig/talloc.pc
@@ -135,24 +139,20 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_mandir}/man3/libtalloc*.3.gz
 
 %files -n python2-talloc
-%defattr(-,root,root,-)
 %{_libdir}/libpytalloc-util.so.*
-%{python_sitearch}/talloc.so
+%{python2_sitearch}/talloc.so
 
 %files -n python2-talloc-devel
-%defattr(-,root,root,-)
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.pc
 %{_libdir}/libpytalloc-util.so
 
 %if 0%{?with_python3}
 %files -n python3-talloc
-%defattr(-,root,root,-)
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
 
 %files -n python3-talloc-devel
-%defattr(-,root,root,-)
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
@@ -167,6 +167,22 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif
 
 %changelog
+* Wed Aug 8 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0
+- Provide sed commend instead of pathfix.py for EL 7
+
+* Fri Jul 13 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-2
+- Drop the unneeded ABI hide patch
+- Use pathfix.py instead of a local patch to munge the python path
+
+* Thu Jul 12 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-1
+- New upstream release - 2.1.14
+- Apply a patch to hide local ABI symbols to avoid issues with new binutils
+- Patch the waf script to explicitly call python2 as "env python" doesn't
+  yield py2 anymore
+
+* Tue Jun 19 2018 Miro Hrončok <mhroncok@redhat.com> - 2.1.13-2
+- Rebuilt for Python 3.7
+
 * Fri Apr 06 2018 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.13-1
 - rhbz#1564323 New upstream release - 2.1.13
 
