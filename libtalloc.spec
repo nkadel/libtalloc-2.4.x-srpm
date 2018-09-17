@@ -177,7 +177,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 * Thu Jul 12 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-1
 - New upstream release - 2.1.14
 - Apply a patch to hide local ABI symbols to avoid issues with new binutils
-- Patch the waf script to explicitly call python2 as "env python" doesn't
+- Patch the waf script to explicitly call python2 as "env python" does not
   yield py2 anymore
 
 * Tue Jun 19 2018 Miro Hrončok <mhroncok@redhat.com> - 2.1.13-2
