@@ -5,8 +5,10 @@
 # Assure that sorting is case sensitive
 LANG=C
 
-MOCKS+=samba4repo-f28-x86_64
-MOCKS+=samba4repo-7-x86_64
+#MOCKS+=samba4repo-7-x86_64
+#MOCKS+=samba4repo-f28-x86_64
+MOCKS+=fedora-28-x86_64
+MOCKS+=epel-7-x86_64
 
 #REPOBASEDIR=/var/www/linux/samba4repo
 REPOBASEDIR:=`/bin/pwd`/../samba4repo
