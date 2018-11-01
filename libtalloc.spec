@@ -6,7 +6,7 @@
 
 Name: libtalloc
 Version: 2.1.14
-Release: 0%{?dist}
+Release: 0.1%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -167,6 +167,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif
 
 %changelog
+* Thu Nov 1 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.1
+- Update Source URL
+
 * Wed Aug 8 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0
 - Provide sed commend instead of pathfix.py for EL 7
 
