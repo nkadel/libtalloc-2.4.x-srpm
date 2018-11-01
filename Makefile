@@ -6,8 +6,8 @@
 LANG=C
 
 #MOCKS+=samba4repo-7-x86_64
-#MOCKS+=samba4repo-f28-x86_64
-MOCKS+=fedora-28-x86_64
+#MOCKS+=samba4repo-f29-x86_64
+MOCKS+=fedora-29-x86_64
 MOCKS+=epel-7-x86_64
 
 #REPOBASEDIR=/var/www/linux/samba4repo
@@ -60,8 +60,8 @@ install:: $(MOCKS)
 	    echo Installing $$repo; \
 	    case $$repo in \
 		*-7-x86_64) yumrelease=el/7; yumarch=x86_64; ;; \
-		*-28-x86_64) yumrelease=fedora/28; yumarch=x86_64; ;; \
-		*-f28-x86_64) yumrelease=fedora/28; yumarch=x86_64; ;; \
+		*-29-x86_64) yumrelease=fedora/29; yumarch=x86_64; ;; \
+		*-f29-x86_64) yumrelease=fedora/29; yumarch=x86_64; ;; \
 		*) echo "Unrecognized relese for $$repo, exiting" >&2; exit 1; ;; \
 	    esac; \
 	    rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
