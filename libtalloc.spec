@@ -158,6 +158,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_libdir}/libpytalloc-util.cpython*.so
 %endif
 
+%if 0%{?fedora} || 0%{?rhel} > 7
 %ldconfig_scriptlets
 
 %ldconfig_scriptlets -n python2-talloc
@@ -165,8 +166,12 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %if 0%{?with_python3}
 %ldconfig_scriptlets -n python3-talloc
 %endif
+%endif # fedora || rhel > 7
 
 %changelog
+* Sun Nov 25 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.2
+- Enable ldconfig_scripts only for fedora || rhel > 7
+
 * Thu Nov 1 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.1
 - Update Source URL
 
