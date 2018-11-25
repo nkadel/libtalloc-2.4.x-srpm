@@ -160,13 +160,18 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 
 %if 0%{?fedora} || 0%{?rhel} > 7
 %ldconfig_scriptlets
-
 %ldconfig_scriptlets -n python2-talloc
-
 %if 0%{?with_python3}
 %ldconfig_scriptlets -n python3-talloc
 %endif
+
+%else
+%post -p /sbin/ldconfig
+%postun -p  /sbin/ldconfig
+%post -n pytalloc -p /sbin/ldconfig
+%postun -n pytalloc -p /sbin/ldconfig
 %endif # fedora || rhel > 7
+
 
 %changelog
 * Sun Nov 25 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.2
