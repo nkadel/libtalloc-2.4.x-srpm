@@ -7,7 +7,9 @@ LANG=C
 
 #MOCKS+=samba4repo-7-x86_64
 #MOCKS+=samba4repo-f29-x86_64
-MOCKS+=fedora-29-x86_64
+#                                           
+# Current libtalloc in Feordan is recent enough
+#MOCKS+=fedora-29-x86_64
 MOCKS+=epel-7-x86_64
 
 #REPOBASEDIR=/var/www/linux/samba4repo
