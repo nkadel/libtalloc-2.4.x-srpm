@@ -82,11 +82,11 @@ install:: $(MOCKS)
 	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
 	done
 clean::
-	rm -rf $(MOCKS)
+	rm -rf */
 	rm -rf rpmbuild
 	rm -f *.out
 
 realclean distclean:: clean
-	rm -f *.src.rpm
+	rm -f *.rpm
 
 FORCE:
