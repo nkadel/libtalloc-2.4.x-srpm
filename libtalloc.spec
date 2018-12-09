@@ -6,7 +6,7 @@
 
 Name: libtalloc
 Version: 2.1.14
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -168,12 +168,19 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %else
 %post -p /sbin/ldconfig
 %postun -p  /sbin/ldconfig
-%post -n pytalloc -p /sbin/ldconfig
-%postun -n pytalloc -p /sbin/ldconfig
+%post -n python2-talloc -p /sbin/ldconfig
+%postun -n python2-talloc -p /sbin/ldconfig
+%if 0%{?with_python3}
+%post -n python3-talloc -p /sbin/ldconfig
+%postun -n python3-talloc -p /sbin/ldconfig
+%endif
 %endif # fedora || rhel > 7
 
 
 %changelog
+* Sat Dec 8 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.3
+- Better handle ldconfig instead of ldconfig_scripts for RHEL 7
+
 * Sun Nov 25 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.2
 - Enable ldconfig_scripts only for fedora || rhel > 7
 
