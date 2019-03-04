@@ -6,7 +6,7 @@
 
 Name: libtalloc
 Version: 2.1.14
-Release: 0.2%{?dist}
+Release: 0.4%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -43,7 +43,7 @@ Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 Provides: pytalloc%{?_isa} = %{version}-%{release}
 Provides: pytalloc = %{version}-%{release}
-Obsoletes: pytalloc < 2.1.3
+Obsoletes: pytalloc < %{version}-%{release}
 %{?python_provide:%python_provide python2-talloc}
 
 %description -n python2-talloc
@@ -55,7 +55,7 @@ Summary: Development libraries for python2-talloc
 Requires: python2-talloc = %{version}-%{release}
 Provides: pytalloc-devel%{?_isa} = %{version}-%{release}
 Provides: pytalloc-devel = %{version}-%{release}
-Obsoletes: pytalloc-devel < 2.1.3
+Obsoletes: pytalloc-devel < %{version}-%{release}
 %{?python_provide:%python_provide python2-talloc-devel}
 
 %description -n python2-talloc-devel
@@ -178,6 +178,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 
 
 %changelog
+* Mon Mar 4 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.4
+- Better label obsolence of pytalloc packages
+
 * Sat Dec 8 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.3
 - Better handle ldconfig instead of ldconfig_scripts for RHEL 7
 
