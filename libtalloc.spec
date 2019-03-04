@@ -6,7 +6,8 @@
 
 Name: libtalloc
 Version: 2.1.14
-Release: 0.4%{?dist}
+#Release: 2%{?dist}
+Release: 0.2%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -98,7 +99,7 @@ export python_LDFLAGS=""
 %if 0%{?with_python3}
 pathfix.py -n -p -i %{__python2} buildtools/bin/waf
 %else
-sed -i 's|^#!/usr/bin/env python|#!%{__python2}|g' buildtools/bin/waf
+sed -i.python2 "s|^#!/usr/bin/env python.*|#!%{__python2}|g" buildtools/bin/waf
 %endif
 
 %configure --disable-rpath \
@@ -161,19 +162,22 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %if 0%{?fedora} || 0%{?rhel} > 7
 %ldconfig_scriptlets
 %ldconfig_scriptlets -n python2-talloc
+
 %if 0%{?with_python3}
 %ldconfig_scriptlets -n python3-talloc
-%endif
+%endif # with_python3
 
 %else
 %post -p /sbin/ldconfig
-%postun -p  /sbin/ldconfig
+%postun -p /sbin/ldconfig
 %post -n python2-talloc -p /sbin/ldconfig
 %postun -n python2-talloc -p /sbin/ldconfig
+
 %if 0%{?with_python3}
 %post -n python3-talloc -p /sbin/ldconfig
 %postun -n python3-talloc -p /sbin/ldconfig
-%endif
+%endif # with_python3
+
 %endif # fedora || rhel > 7
 
 
