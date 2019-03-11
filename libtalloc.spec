@@ -5,9 +5,8 @@
 %endif
 
 Name: libtalloc
-Version: 2.1.14
-#Release: 2%{?dist}
-Release: 0.2%{?dist}
+Version: 2.1.16
+Release: 0.1%{?dist}
 Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
@@ -80,7 +79,7 @@ Requires: python3-talloc = %{version}-%{release}
 
 %description -n python3-talloc-devel
 Development libraries for python3-talloc
-%endif
+%endif # with_python3
 
 %prep
 %autosetup -n talloc-%{version} -p1
@@ -91,7 +90,7 @@ Development libraries for python3-talloc
 PY3_CONFIG_FLAGS=--extra-python=%{__python3}
 %else
 PY3_CONFIG_FLAGS=""
-%endif
+%endif # with_python3
 
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 export python_LDFLAGS=""
@@ -99,7 +98,7 @@ export python_LDFLAGS=""
 %if 0%{?with_python3}
 pathfix.py -n -p -i %{__python2} buildtools/bin/waf
 %else
-sed -i.python2 "s|^#!/usr/bin/env python.*|#!%{__python2}|g" buildtools/bin/waf
+sed -i 's|^#!/usr/bin/env python.*|#!%{__python2}|g' buildtools/bin/waf
 %endif
 
 %configure --disable-rpath \
@@ -162,27 +161,24 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %if 0%{?fedora} || 0%{?rhel} > 7
 %ldconfig_scriptlets
 %ldconfig_scriptlets -n python2-talloc
-
 %if 0%{?with_python3}
 %ldconfig_scriptlets -n python3-talloc
-%endif # with_python3
+%endif
 
 %else
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 %post -n python2-talloc -p /sbin/ldconfig
 %postun -n python2-talloc -p /sbin/ldconfig
-
 %if 0%{?with_python3}
 %post -n python3-talloc -p /sbin/ldconfig
 %postun -n python3-talloc -p /sbin/ldconfig
-%endif # with_python3
-
+%endif
 %endif # fedora || rhel > 7
 
 
 %changelog
-* Mon Mar 4 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.4
+* Mon Mar 4 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.1
 - Better label obsolence of pytalloc packages
 
 * Sat Dec 8 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.3
