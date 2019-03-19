@@ -1,22 +1,37 @@
 %if 0%{?fedora} || 0%{?rhel} > 7
 %global with_python3 1
-%else
-%global with_python3 0
+%endif
+
+%if 0%{?fedora} || 0%{?rhel} < 8
+%global with_python2 1
+%endif
+
+%if (0%{?with_python2} == 1 && 0%{?with_python3} == 0)
+# We need to sent env PYTHON for python2 only build
+%global export_waf_python export PYTHON=%{__python2}
+%endif
+
+%if (0%{?with_python2} == 1 && 0%{?with_python3} == 1)
+# python3 is default and therefore python2 need to be set as extra-python
+%global extra_python --extra-python=%{__python2}
 %endif
 
 Name: libtalloc
 Version: 2.1.16
 Release: 0.1%{?dist}
-Group: System Environment/Daemons
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
 Source: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
 
+# Patches
+
 BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
+%if 0%{?with_python2}
 BuildRequires: python2-devel
+%endif
 %if 0%{?with_python3}
 BuildRequires: python3-devel
 %endif
@@ -24,46 +39,42 @@ BuildRequires: doxygen
 
 Provides: bundled(libreplace)
 
-# Patches
-
 %description
 A library that implements a hierarchical allocator with destructors.
 
 %package devel
-Group: Development/Libraries
 Summary: Developer tools for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 
 %description devel
 Header files needed to develop programs that link against the Talloc library.
 
+%if 0%{?with_python2}
 %package -n python2-talloc
-Group: Development/Libraries
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 Provides: pytalloc%{?_isa} = %{version}-%{release}
 Provides: pytalloc = %{version}-%{release}
-Obsoletes: pytalloc < %{version}-%{release}
+Obsoletes: pytalloc < 2.1.3
 %{?python_provide:%python_provide python2-talloc}
 
 %description -n python2-talloc
 Python 2 libraries for creating bindings using talloc
 
 %package -n python2-talloc-devel
-Group: Development/Libraries
 Summary: Development libraries for python2-talloc
 Requires: python2-talloc = %{version}-%{release}
 Provides: pytalloc-devel%{?_isa} = %{version}-%{release}
 Provides: pytalloc-devel = %{version}-%{release}
-Obsoletes: pytalloc-devel < %{version}-%{release}
+Obsoletes: pytalloc-devel < 2.1.3
 %{?python_provide:%python_provide python2-talloc-devel}
 
 %description -n python2-talloc-devel
 Development libraries for python2-talloc
+%endif
 
 %if 0%{?with_python3}
 %package -n python3-talloc
-Group: Development/Libraries
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 %{?python_provide:%python_provide python3-talloc}
@@ -72,58 +83,39 @@ Requires: libtalloc = %{version}-%{release}
 Python 3 libraries for creating bindings using talloc
 
 %package -n python3-talloc-devel
-Group: Development/Libraries
 Summary: Development libraries for python3-talloc
 Requires: python3-talloc = %{version}-%{release}
 %{?python_provide:%python_provide python3-talloc-devel}
 
 %description -n python3-talloc-devel
 Development libraries for python3-talloc
-%endif # with_python3
+%endif
 
 %prep
 %autosetup -n talloc-%{version} -p1
 
 %build
-
-%if 0%{?with_python3}
-PY3_CONFIG_FLAGS=--extra-python=%{__python3}
-%else
-PY3_CONFIG_FLAGS=""
-%endif # with_python3
-
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 export python_LDFLAGS=""
 
-%if 0%{?with_python3}
-pathfix.py -n -p -i %{__python2} buildtools/bin/waf
-%else
-sed -i 's|^#!/usr/bin/env python.*|#!%{__python2}|g' buildtools/bin/waf
-%endif
-
+%{?export_waf_python}
 %configure --disable-rpath \
            --disable-rpath-install \
            --bundled-libraries=NONE \
            --builtin-libraries=replace \
            --disable-silent-rules \
-           $PY3_CONFIG_FLAGS
+           %{?extra_python}
 
 make %{?_smp_mflags} V=1
 doxygen doxy.config
 
 %check
+%{?export_waf_python}
 make %{?_smp_mflags} check
 
 %install
-
+%{?export_waf_python}
 make install DESTDIR=$RPM_BUILD_ROOT
-
-# Shared libraries need to be marked executable for
-# rpmbuild to strip them and include them in debuginfo
-find $RPM_BUILD_ROOT -name "*.so*" -exec chmod -c +x {} \;
-
-rm -f $RPM_BUILD_ROOT%{_libdir}/libtalloc.a
-rm -f $RPM_BUILD_ROOT/usr/share/swig/*/talloc.i
 
 # Install API docs
 cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
@@ -138,6 +130,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_mandir}/man3/talloc*.3.gz
 %{_mandir}/man3/libtalloc*.3.gz
 
+%if 0%{?with_python2}
 %files -n python2-talloc
 %{_libdir}/libpytalloc-util.so.*
 %{python2_sitearch}/talloc.so
@@ -146,6 +139,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.pc
 %{_libdir}/libpytalloc-util.so
+%endif
 
 %if 0%{?with_python3}
 %files -n python3-talloc
@@ -158,40 +152,29 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_libdir}/libpytalloc-util.cpython*.so
 %endif
 
-%if 0%{?fedora} || 0%{?rhel} > 7
 %ldconfig_scriptlets
+
+%if 0%{?with_python2}
 %ldconfig_scriptlets -n python2-talloc
+%endif
+
 %if 0%{?with_python3}
 %ldconfig_scriptlets -n python3-talloc
 %endif
 
-%else
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
-%post -n python2-talloc -p /sbin/ldconfig
-%postun -n python2-talloc -p /sbin/ldconfig
-%if 0%{?with_python3}
-%post -n python3-talloc -p /sbin/ldconfig
-%postun -n python3-talloc -p /sbin/ldconfig
-%endif
-%endif # fedora || rhel > 7
-
-
 %changelog
-* Mon Mar 4 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.1
-- Better label obsolence of pytalloc packages
+* Tue Mar 19 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.1
+- Roll back release to avoid rawhide conflicts
+- Include python2/python3 workarounds for Fedora python3 defaults
 
-* Sat Dec 8 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.3
-- Better handle ldconfig instead of ldconfig_scripts for RHEL 7
+* Tue Feb 26 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.16-1
+- rhbz#1683211 - libtalloc-2.1.16 is available
 
-* Sun Nov 25 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.2
-- Enable ldconfig_scripts only for fedora || rhel > 7
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
-* Thu Nov 1 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0.1
-- Update Source URL
-
-* Wed Aug 8 2018 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.14-0
-- Provide sed commend instead of pathfix.py for EL 7
+* Thu Jan 17 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.15-1
+- rhbz#1667471 - libtalloc-2.1.15 is available
 
 * Fri Jul 13 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-2
 - Drop the unneeded ABI hide patch
@@ -200,7 +183,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 * Thu Jul 12 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-1
 - New upstream release - 2.1.14
 - Apply a patch to hide local ABI symbols to avoid issues with new binutils
-- Patch the waf script to explicitly call python2 as "env python" does not
+- Patch the waf script to explicitly call python2 as "env python" doesn't
   yield py2 anymore
 
 * Tue Jun 19 2018 Miro Hrončok <mhroncok@redhat.com> - 2.1.13-2
