@@ -5,10 +5,9 @@
 # Assure that sorting is case sensitive
 LANG=C
 
-# Current libtalloc in Feordan is recent enough
+#
 MOCKS+=fedora-29-x86_64
 MOCKS+=epel-7-x86_64
-MOCKS+=epel-6-x86_64
 
 # repositories to touch after installation
 #MOCKCFGS+=samba4repo-f29-x86_64
@@ -83,6 +82,7 @@ install:: $(MOCKS)
 	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
 	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
 	done
+
 clean::
 	rm -rf */
 	rm -rf rpmbuild
