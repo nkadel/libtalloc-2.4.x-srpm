@@ -152,20 +152,27 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_libdir}/libpytalloc-util.cpython*.so
 %endif
 
-%ldconfig_scriptlets
+#%%ldconfig_scriptlets
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
 
 %if 0%{?with_python2}
-%ldconfig_scriptlets -n python2-talloc
+#%%ldconfig_scriptlets -n python2-talloc
+%post -n python2-talloc -p /sbin/ldconfig
+%postun -n python2-talloc -p /sbin/ldconfig
 %endif
 
 %if 0%{?with_python3}
-%ldconfig_scriptlets -n python3-talloc
+#%%ldconfig_scriptlets -n python3-talloc
+%post -n python3-talloc -p /sbin/ldconfig
+%postun -n python3-talloc -p /sbin/ldconfig
 %endif
 
 %changelog
 * Tue Mar 19 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.1
 - Roll back release to avoid rawhide conflicts
 - Include python2/python3 workarounds for Fedora python3 defaults
+- Revert use of ldconfig_scriptlets
 
 * Tue Feb 26 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.16-1
 - rhbz#1683211 - libtalloc-2.1.16 is available
