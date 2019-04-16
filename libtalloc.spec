@@ -1,11 +1,18 @@
 # Single python3 version in Fedora, python3_pkgversion macro not available
 %{!?python3_pkgversion:%global python3_pkgversion 3}
+%{!?python2_pkgversion:%global python2_pkgversion 2}
 
-# For consistency and completeness
-%global python2_pkgversion 2
-# python36 support added for RHEL 7
+%if 0%{?fedora} || 0%{?rhel} > 6
 %global with_python3 1
+%else
+%global with_python3 0
+%endif
+
+%if 0%{?fedora} || 0%{?rhel} < 8
 %global with_python2 1
+%else
+%global with_python2 0
+%endif
 
 %if %{with_python2} && ! %{with_python3}
 # We need to sent env PYTHON for python2 only build
@@ -16,10 +23,6 @@
 # python3 is default and therefore python2 need to be set as extra-python
 %global extra_python --extra-python=%{__python2}
 %endif
-
-%if 0%{?rhel} == 7
-%global __python3 /usr/bin/python3.6
-%endif # rhel == 7
 
 Name: libtalloc
 Version: 2.1.16
@@ -90,11 +93,7 @@ Python 3 libraries for creating bindings using talloc
 %package -n python%{python3_pkgversion}-talloc-devel
 Summary: Development libraries for python%{python3_pkgversion}-talloc
 Requires: python%{python3_pkgversion}-talloc = %{version}-%{release}
-%if 0%{?rhel} == 7
-%{?python_provide:%python_provide python36-talloc-devel}
-%else
 %{?python_provide:%python_provide python%{python3_pkgversion}-talloc-devel}
-%endif # rhel == 7
 
 %description -n python%{python3_pkgversion}-talloc-devel
 Development libraries for python%{python3_pkgversion}-talloc
