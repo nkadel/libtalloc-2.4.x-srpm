@@ -66,8 +66,6 @@ install:: $(MOCKS)
 	    echo "Pushing RPMS to $$rpmdir"; \
 	    rsync -av $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
 	    createrepo -q --update $$rpmdir/.; \
-	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
-	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
 	done
 	@for repo in $(MOCKCFGS); do \
 	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
