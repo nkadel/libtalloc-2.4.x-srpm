@@ -1,6 +1,32 @@
+# Single python3 version in Fedora, python3_pkgversion macro not available
+%{!?python3_pkgversion:%global python3_pkgversion 3}
+%{!?python2_pkgversion:%global python2_pkgversion 2}
+
+%if 0%{?fedora} || 0%{?rhel} > 6
+%global with_python3 1
+%else
+%global with_python3 0
+%endif
+
+%if 0%{?fedora} || 0%{?rhel} < 8
+%global with_python2 1
+%else
+%global with_python2 0
+%endif
+
+%if %{with_python2} && ! %{with_python3}
+# We need to sent env PYTHON for python2 only build
+%global export_waf_python export PYTHON=%{__python2}
+%endif
+
+%if %{with_python2} && %{with_python3}
+# python3 is default and therefore python2 need to be set as extra-python
+%global extra_python --extra-python=%{__python2}
+%endif
+
 Name: libtalloc
-Version: 2.2.0
-Release: 0.1%{?dist}
+Version: 2.1.16
+Release: 0.2%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -11,7 +37,12 @@ Source: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
-BuildRequires: python3-devel
+%if %{with_python2}
+BuildRequires: python%{python2_pkgversion}-devel
+%endif
+%if %{with_python3}
+BuildRequires: python%{python3_pkgversion}-devel
+%endif # with_pythone
 BuildRequires: doxygen
 
 Provides: bundled(libreplace)
@@ -26,21 +57,47 @@ Requires: libtalloc = %{version}-%{release}
 %description devel
 Header files needed to develop programs that link against the Talloc library.
 
-%package -n python3-talloc
+%if %{with_python2}
+%package -n python%{python2_pkgversion}-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
-%{?python_provide:%python_provide python3-talloc}
+Provides: pytalloc%{?_isa} = %{version}-%{release}
+Provides: pytalloc = %{version}-%{release}
+Obsoletes: pytalloc < 2.1.3
+%{?python_provide:%python_provide python%{python2_pkgversion}-talloc}
 
-%description -n python3-talloc
+%description -n python%{python2_pkgversion}-talloc
+Python 2 libraries for creating bindings using talloc
+
+%package -n python%{python2_pkgversion}-talloc-devel
+Summary: Development libraries for python%{python2_pkgversion}-talloc
+Requires: python%{python2_pkgversion}-talloc = %{version}-%{release}
+Provides: pytalloc-devel%{?_isa} = %{version}-%{release}
+Provides: pytalloc-devel = %{version}-%{release}
+Obsoletes: pytalloc-devel < 2.1.3
+%{?python_provide:%python_provide python%{python2_pkgversion}-talloc-devel}
+
+%description -n python%{python2_pkgversion}-talloc-devel
+Development libraries for python%{python2_pkgversion}-talloc
+%endif # with_python2
+
+%if %{with_python3}
+%package -n python%{python3_pkgversion}-talloc
+Summary: Python bindings for the Talloc library
+Requires: libtalloc = %{version}-%{release}
+%{?python_provide:%python_provide python%{python3_pkgversion}-talloc}
+
+%description -n python%{python3_pkgversion}-talloc
 Python 3 libraries for creating bindings using talloc
 
-%package -n python3-talloc-devel
-Summary: Development libraries for python3-talloc
-Requires: python3-talloc = %{version}-%{release}
-%{?python_provide:%python_provide python3-talloc-devel}
+%package -n python%{python3_pkgversion}-talloc-devel
+Summary: Development libraries for python%{python3_pkgversion}-talloc
+Requires: python%{python3_pkgversion}-talloc = %{version}-%{release}
+%{?python_provide:%python_provide python%{python3_pkgversion}-talloc-devel}
 
-%description -n python3-talloc-devel
-Development libraries for python3-talloc
+%description -n python%{python3_pkgversion}-talloc-devel
+Development libraries for python%{python3_pkgversion}-talloc
+%endif # with_python3
 
 %prep
 %autosetup -n talloc-%{version} -p1
@@ -49,19 +106,23 @@ Development libraries for python3-talloc
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 export python_LDFLAGS=""
 
+%{?export_waf_python}
 %configure --disable-rpath \
            --disable-rpath-install \
            --bundled-libraries=NONE \
            --builtin-libraries=replace \
-           --disable-silent-rules
+           --disable-silent-rules \
+           %{?extra_python}
 
 make %{?_smp_mflags} V=1
 doxygen doxy.config
 
 %check
+%{?export_waf_python}
 make %{?_smp_mflags} check
 
 %install
+%{?export_waf_python}
 make install DESTDIR=$RPM_BUILD_ROOT
 
 # Install API docs
@@ -77,27 +138,47 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_mandir}/man3/talloc*.3.gz
 %{_mandir}/man3/libtalloc*.3.gz
 
-%files -n python3-talloc
+%if %{with_python2}
+%files -n python%{python2_pkgversion}-talloc
+%{_libdir}/libpytalloc-util.so.*
+%{python2_sitearch}/talloc.so
+
+%files -n python%{python2_pkgversion}-talloc-devel
+%{_includedir}/pytalloc.h
+%{_libdir}/pkgconfig/pytalloc-util.pc
+%{_libdir}/libpytalloc-util.so
+%endif
+
+%if %{with_python3}
+%files -n python%{python3_pkgversion}-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
 
-%files -n python3-talloc-devel
+%files -n python%{python3_pkgversion}-talloc-devel
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
+%endif
 
 #%%ldconfig_scriptlets
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-#%%ldconfig_scriptlets -n python3-talloc
-%post -n python3-talloc -p /sbin/ldconfig
-%postun -n python3-talloc -p /sbin/ldconfig
+%if %{with_python2}
+#%%ldconfig_scriptlets -n python%{python2_pkgversion}-talloc
+%post -n python%{python2_pkgversion}-talloc -p /sbin/ldconfig
+%postun -n python%{python2_pkgversion}-talloc -p /sbin/ldconfig
+%endif
+
+%if %{with_python3}
+#%%ldconfig_scriptlets -n python%{python3_pkgversion}-talloc
+%post -n python%{python3_pkgversion}-talloc -p /sbin/ldconfig
+%postun -n python%{python3_pkgversion}-talloc -p /sbin/ldconfig
+%endif # with_python3
 
 %changelog
-* Mon Apr 1 2019  Nico Kadel-Garcia <nkadel@gmail.com> - 2.2.0-0
-- Update to 2.2.0
-- Discard python2
+* Mon Apr 15 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.2
+- Add python36 support for RHEL 7
 
 * Tue Mar 19 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.1
 - Roll back release to avoid rawhide conflicts
