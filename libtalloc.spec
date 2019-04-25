@@ -1,15 +1,10 @@
 # Single python3 version in Fedora, python3_pkgversion macro not available
 %{!?python3_pkgversion:%global python3_pkgversion 3}
 
-%if (0%{?fedora} || 0%{?rhel} > 6)
 %global with_python3 1
-%else
-%global with_python3 0
-%endif
 
-%if (0%{?fedora} || 0%{?rhel} < 8)
 %global with_python2 1
-%else
+%if 0%{?fedora} > 30
 %global with_python2 0
 %endif
 
@@ -25,7 +20,7 @@
 
 Name: libtalloc
 Version: 2.1.16
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -176,6 +171,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif # with_python3
 
 %changelog
+* Thu Apr 25 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.3
+- Update python2/python3 logic to discard python2 for Fedora > 30
+
 * Mon Apr 15 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.2
 - Add python36 support for RHEL 7
 
