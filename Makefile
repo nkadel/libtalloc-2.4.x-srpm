@@ -17,6 +17,9 @@ SPEC := libtalloc.spec
 
 all:: $(MOCKS)
 
+getsrc:: FORCE
+	spectool -g $(SPEC)
+
 srpm:: FORCE
 	@echo "Building SRPM with $(SPEC)"
 	rm -rf rpmbuild
