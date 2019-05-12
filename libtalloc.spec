@@ -172,7 +172,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif # with_python3
 
 %changelog
-* Sun May 13 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.4
+* Sun May 12 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.4
 - Disable python2 building for RHEL 8
 
 * Thu Apr 25 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.3
