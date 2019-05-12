@@ -3,9 +3,10 @@
 
 %global with_python3 1
 
-%global with_python2 1
-%if 0%{?fedora} > 30
+%if 0%{?fedora} > 30 || 0%{?rhel} > 7
 %global with_python2 0
+%else
+%global with_python2 1
 %endif
 
 %if (%{with_python2} && ! %{with_python3})
@@ -20,7 +21,7 @@
 
 Name: libtalloc
 Version: 2.1.16
-Release: 0.3%{?dist}
+Release: 0.4%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -171,6 +172,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif # with_python3
 
 %changelog
+* Sun May 13 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.4
+- Disable python2 building for RHEL 8
+
 * Thu Apr 25 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.3
 - Update python2/python3 logic to discard python2 for Fedora > 30
 
