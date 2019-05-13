@@ -3,7 +3,7 @@
 
 %global with_python3 1
 
-%if 0%{?fedora} > 30 || 0%{?rhel} > 7
+%if 0%{?fedora} > 30
 %global with_python2 0
 %else
 %global with_python2 1
