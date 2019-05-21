@@ -5,22 +5,20 @@
 # Assure that sorting is case sensitive
 LANG=C
 
-#
-MOCKS+=fedora-29-x86_64
+MOCKS+=fedora-f30-x86_64
+MOCKS+=fedora-f29-x86_64
+MOCKS+=epel-8-x86_64
 MOCKS+=epel-7-x86_64
-#MOCKS+=samba4repo-8-x86_64
-
-# repositories to touch after installation
-MOCKCFGS+=samba4repo-f29-x86_64
-MOCKCFGS+=samba4repo-7-x86_64
-#MOCFGS+=samba4repo-8-x86_64
 
 #REPOBASEDIR=/var/www/linux/samba4repo
 REPOBASEDIR:=`/bin/pwd`/../samba4repo
 
-SPEC := libtalloc.spec
+SPEC := `ls *.spec`
 
 all:: $(MOCKS)
+
+getsrc:: FORCE
+	spectool -g $(SPEC)
 
 srpm:: FORCE
 	@echo "Building SRPM with $(SPEC)"
@@ -39,7 +37,7 @@ $(MOCKS):: srpm FORCE
 	else \
 		echo "Storing " rpmbuild/SRPMS/*.src.rpm "as $@.src.rpm"; \
 		install rpmbuild/SRPMS/*.src.rpm $@.src.rpm; \
-		echo "Building $@.src.rpm in $@"; \
+		echo "Actally building RPMS in $@"; \
 		rm -rf $@; \
 		mock -q -r $(PWD)/../$@.cfg \
 		     --resultdir=$(PWD)/$@ \
@@ -56,6 +54,9 @@ install:: $(MOCKS)
 		*-8-x86_64) yumrelease=el/8; yumarch=x86_64; ;; \
 		*-29-x86_64) yumrelease=fedora/29; yumarch=x86_64; ;; \
 		*-f29-x86_64) yumrelease=fedora/29; yumarch=x86_64; ;; \
+		*-30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
+		*-f30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
+		*-rawhide-x86_64) yumrelease=fedora/rawhide; yumarch=x86_64; ;; \
 		*) echo "Unrecognized release for $$repo, exiting" >&2; exit 1; ;; \
 	    esac; \
 	    rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
@@ -66,10 +67,6 @@ install:: $(MOCKS)
 	    echo "Pushing RPMS to $$rpmdir"; \
 	    rsync -av $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
 	    createrepo -q --update $$rpmdir/.; \
-	done
-	@for repo in $(MOCKCFGS); do \
-	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
-	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
 	done
 
 clean::
