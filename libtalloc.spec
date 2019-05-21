@@ -1,32 +1,27 @@
 # Single python3 version in Fedora, python3_pkgversion macro not available
 %{!?python3_pkgversion:%global python3_pkgversion 3}
-%{!?python2_pkgversion:%global python2_pkgversion 2}
 
-%if 0%{?fedora} || 0%{?rhel} > 6
 %global with_python3 1
-%else
-%global with_python3 0
-%endif
 
-%if 0%{?fedora} || 0%{?rhel} < 8
-%global with_python2 1
-%else
+%if 0%{?fedora} > 30
 %global with_python2 0
+%else
+%global with_python2 1
 %endif
 
-%if %{with_python2} && ! %{with_python3}
+%if (%{with_python2} && ! %{with_python3})
 # We need to sent env PYTHON for python2 only build
 %global export_waf_python export PYTHON=%{__python2}
 %endif
 
-%if %{with_python2} && %{with_python3}
+%if (%{with_python2} && %{with_python3})
 # python3 is default and therefore python2 need to be set as extra-python
 %global extra_python --extra-python=%{__python2}
 %endif
 
 Name: libtalloc
 Version: 2.1.16
-Release: 0.2%{?dist}
+Release: 0.4%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -38,7 +33,7 @@ BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
 %if %{with_python2}
-BuildRequires: python%{python2_pkgversion}-devel
+BuildRequires: python2-devel
 %endif
 %if %{with_python3}
 BuildRequires: python%{python3_pkgversion}-devel
@@ -58,27 +53,27 @@ Requires: libtalloc = %{version}-%{release}
 Header files needed to develop programs that link against the Talloc library.
 
 %if %{with_python2}
-%package -n python%{python2_pkgversion}-talloc
+%package -n python2-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 Provides: pytalloc%{?_isa} = %{version}-%{release}
 Provides: pytalloc = %{version}-%{release}
 Obsoletes: pytalloc < 2.1.3
-%{?python_provide:%python_provide python%{python2_pkgversion}-talloc}
+%{?python_provide:%python_provide python2-talloc}
 
-%description -n python%{python2_pkgversion}-talloc
+%description -n python2-talloc
 Python 2 libraries for creating bindings using talloc
 
-%package -n python%{python2_pkgversion}-talloc-devel
-Summary: Development libraries for python%{python2_pkgversion}-talloc
-Requires: python%{python2_pkgversion}-talloc = %{version}-%{release}
+%package -n python2-talloc-devel
+Summary: Development libraries for python2-talloc
+Requires: python2-talloc = %{version}-%{release}
 Provides: pytalloc-devel%{?_isa} = %{version}-%{release}
 Provides: pytalloc-devel = %{version}-%{release}
 Obsoletes: pytalloc-devel < 2.1.3
-%{?python_provide:%python_provide python%{python2_pkgversion}-talloc-devel}
+%{?python_provide:%python_provide python2-talloc-devel}
 
-%description -n python%{python2_pkgversion}-talloc-devel
-Development libraries for python%{python2_pkgversion}-talloc
+%description -n python2-talloc-devel
+Development libraries for python2-talloc
 %endif # with_python2
 
 %if %{with_python3}
@@ -139,11 +134,11 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_mandir}/man3/libtalloc*.3.gz
 
 %if %{with_python2}
-%files -n python%{python2_pkgversion}-talloc
+%files -n python2-talloc
 %{_libdir}/libpytalloc-util.so.*
 %{python2_sitearch}/talloc.so
 
-%files -n python%{python2_pkgversion}-talloc-devel
+%files -n python2-talloc-devel
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.pc
 %{_libdir}/libpytalloc-util.so
@@ -165,9 +160,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %postun -p /sbin/ldconfig
 
 %if %{with_python2}
-#%%ldconfig_scriptlets -n python%{python2_pkgversion}-talloc
-%post -n python%{python2_pkgversion}-talloc -p /sbin/ldconfig
-%postun -n python%{python2_pkgversion}-talloc -p /sbin/ldconfig
+#%%ldconfig_scriptlets -n python2-talloc
+%post -n python2-talloc -p /sbin/ldconfig
+%postun -n python2-talloc -p /sbin/ldconfig
 %endif
 
 %if %{with_python3}
@@ -177,6 +172,12 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif # with_python3
 
 %changelog
+* Sun May 12 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.4
+- Disable python2 building for RHEL 8
+
+* Thu Apr 25 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.3
+- Update python2/python3 logic to discard python2 for Fedora > 30
+
 * Mon Apr 15 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.2
 - Add python36 support for RHEL 7
 
