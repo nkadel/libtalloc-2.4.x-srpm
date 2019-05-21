@@ -5,8 +5,8 @@
 # Assure that sorting is case sensitive
 LANG=C
 
-MOCKS+=fedora-f30-x86_64
-MOCKS+=fedora-f29-x86_64
+MOCKS+=fedora-30-x86_64
+MOCKS+=fedora-29-x86_64
 MOCKS+=epel-8-x86_64
 MOCKS+=epel-7-x86_64
 
