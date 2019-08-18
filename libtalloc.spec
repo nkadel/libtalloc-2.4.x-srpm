@@ -3,11 +3,8 @@
 
 %global with_python3 1
 
-%if 0%{?fedora} > 30
+# No longer python2 compatible
 %global with_python2 0
-%else
-%global with_python2 1
-%endif
 
 %if (%{with_python2} && ! %{with_python3})
 # We need to sent env PYTHON for python2 only build
@@ -20,7 +17,7 @@
 %endif
 
 Name: libtalloc
-Version: 2.1.16
+Version: 2.2.0
 Release: 0.4%{?dist}
 Summary: The talloc library
 License: LGPLv3+
@@ -81,6 +78,9 @@ Development libraries for python2-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 %{?python_provide:%python_provide python%{python3_pkgversion}-talloc}
+%if ! %{with_python2}
+Obsoletes:  python2-talloc
+%endif
 
 %description -n python%{python3_pkgversion}-talloc
 Python 3 libraries for creating bindings using talloc
@@ -89,6 +89,9 @@ Python 3 libraries for creating bindings using talloc
 Summary: Development libraries for python%{python3_pkgversion}-talloc
 Requires: python%{python3_pkgversion}-talloc = %{version}-%{release}
 %{?python_provide:%python_provide python%{python3_pkgversion}-talloc-devel}
+%if ! %{with_python2}
+Obsoletes:  python2-talloc-devel
+%endif
 
 %description -n python%{python3_pkgversion}-talloc-devel
 Development libraries for python%{python3_pkgversion}-talloc
@@ -172,6 +175,11 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif # with_python3
 
 %changelog
+* Sun Jul 28 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.2.0-0
+- Update to 2.2.0
+- Obsolete python2 packages if python2 disabled
+- Disable python2 entirely
+
 * Sun May 12 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.4
 - Disable python2 building for RHEL 8
 
