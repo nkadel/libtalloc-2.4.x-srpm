@@ -6,7 +6,7 @@
 LANG=C
 
 # Fedora includes 2.1.16
-#MOCKS+=fedora-30-x86_64
+MOCKS+=fedora-30-x86_64
 #MOCKS+=epel-8-x86_64
 MOCKS+=epel-7-x86_64
 
@@ -61,10 +61,10 @@ install:: $(MOCKS)
 	    srpmdir=$(REPOBASEDIR)/$$yumrelease/SRPMS; \
 	    echo "Pushing SRPMS to $$srpmdir"; \
 	    rsync -av $$repo/*.src.rpm --no-owner --no-group $$repo/*.src.rpm $$srpmdir/. || exit 1; \
-	    createrepo -q --update $$srpmdir/.; \
+	    createrepo -q $$srpmdir/.; \
 	    echo "Pushing RPMS to $$rpmdir"; \
 	    rsync -av $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
-	    createrepo -q --update $$rpmdir/.; \
+	    createrepo -q $$rpmdir/.; \
 	done
 
 clean::
