@@ -17,8 +17,8 @@
 %endif
 
 Name: libtalloc
-Version: 2.2.0
-Release: 0.4%{?dist}
+Version: 2.3.0
+Release: 0%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -175,6 +175,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif # with_python3
 
 %changelog
+* Wed Sep 4 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.0-0
+- Update to 2.3.0
+
 * Sun Jul 28 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.2.0-0
 - Update to 2.2.0
 - Obsolete python2 packages if python2 disabled
