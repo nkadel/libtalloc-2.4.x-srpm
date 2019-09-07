@@ -5,10 +5,13 @@
 # Assure that sorting is case sensitive
 LANG=C
 
-# Fedora includes 2.1.16
 MOCKS+=fedora-30-x86_64
 #MOCKS+=epel-8-x86_64
 MOCKS+=epel-7-x86_64
+
+MOCKCFGS=samba4repo-f30-x86_64
+MOCKREPO=samba4repo-8-x86_64
+MOCKREPO=samba4repo-7-x86_64
 
 #REPOBASEDIR=/var/www/linux/samba4repo
 REPOBASEDIR:=`/bin/pwd`/../samba4repo
@@ -36,8 +39,8 @@ $(MOCKS):: srpm FORCE
 		echo "	Skipping RPM populated $@"; \
 	else \
 		echo "Storing " rpmbuild/SRPMS/*.src.rpm "as $@.src.rpm"; \
-		install rpmbuild/SRPMS/*.src.rpm $@.src.rpm; \
-		echo "Actally building RPMS in $@"; \
+		rsync -a rpmbuild/SRPMS/*.src.rpm $@.src.rpm; \
+		echo "Building $@.src.rpm in $@"; \
 		rm -rf $@; \
 		mock -q -r $(PWD)/../$@.cfg \
 		     --resultdir=$(PWD)/$@ \
@@ -50,11 +53,11 @@ install:: $(MOCKS)
 	@for repo in $(MOCKS); do \
 	    echo Installing $$repo; \
 	    case $$repo in \
+		*-6-x86_64) yumrelease=el/6; yumarch=x86_64; ;; \
 		*-7-x86_64) yumrelease=el/7; yumarch=x86_64; ;; \
 		*-8-x86_64) yumrelease=el/8; yumarch=x86_64; ;; \
 		*-30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
 		*-f30-x86_64) yumrelease=fedora/30; yumarch=x86_64; ;; \
-		*-rawhide-x86_64) yumrelease=fedora/rawhide; yumarch=x86_64; ;; \
 		*) echo "Unrecognized release for $$repo, exiting" >&2; exit 1; ;; \
 	    esac; \
 	    rpmdir=$(REPOBASEDIR)/$$yumrelease/$$yumarch; \
@@ -65,6 +68,10 @@ install:: $(MOCKS)
 	    echo "Pushing RPMS to $$rpmdir"; \
 	    rsync -av $$repo/*.rpm --exclude=*.src.rpm --exclude=*debuginfo*.rpm --no-owner --no-group $$repo/*.rpm $$rpmdir/. || exit 1; \
 	    createrepo -q $$rpmdir/.; \
+	done
+	@for repo in $(MOCKCFGS); do \
+	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
+	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
 	done
 
 clean::
