@@ -1,6 +1,3 @@
-# Single python3 version in Fedora, python3_pkgversion macro not available
-%{!?python3_pkgversion:%global python3_pkgversion 3}
-
 %global with_python3 1
 
 # No longer python2 compatible
@@ -25,6 +22,11 @@ URL: https://talloc.samba.org/
 Source: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
 
 # Patches
+
+%if (0%{?rhel > 0 && 0%{?rhel} <= 7)
+# Addresses python36- versus python3- dependencies
+BuildRequires: epel-rpm-macros
+%endif
 
 BuildRequires: gcc
 BuildRequires: libxslt
