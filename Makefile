@@ -6,7 +6,7 @@
 LANG=C
 
 MOCKS+=fedora-30-x86_64
-#MOCKS+=epel-8-x86_64
+MOCKS+=epel-8-x86_64
 MOCKS+=epel-7-x86_64
 
 MOCKCFGS=samba4repo-f30-x86_64
@@ -70,7 +70,7 @@ install:: $(MOCKS)
 	    createrepo -q $$rpmdir/.; \
 	done
 	@for repo in $(MOCKCFGS); do \
-	    echo "Touching $(PWD)/../$$repo.cfg to clear cache"; \
+	    echo "Touching $(PWD)/../$$repo.cfg"; \
 	    /bin/touch --no-dereference $(PWD)/../$$repo.cfg; \
 	done
 
