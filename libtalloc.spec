@@ -14,7 +14,7 @@
 %endif
 
 Name: libtalloc
-Version: 2.3.0
+Version: 2.3.1
 Release: 0%{?dist}
 Summary: The talloc library
 License: LGPLv3+
@@ -177,6 +177,9 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif # with_python3
 
 %changelog
+* Wed Dec 18 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-0
+- Update to 2.3.1
+
 * Wed Sep 4 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.0-0
 - Update to 2.3.0
 
