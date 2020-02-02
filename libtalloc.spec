@@ -57,7 +57,7 @@ Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 Provides: pytalloc%{?_isa} = %{version}-%{release}
 Provides: pytalloc = %{version}-%{release}
-Obsoletes: pytalloc < 2.1.3
+Obsoletes: pytalloc <= %{version}-%{release}
 %{?python_provide:%python_provide python2-talloc}
 
 %description -n python2-talloc
@@ -68,7 +68,7 @@ Summary: Development libraries for python2-talloc
 Requires: python2-talloc = %{version}-%{release}
 Provides: pytalloc-devel%{?_isa} = %{version}-%{release}
 Provides: pytalloc-devel = %{version}-%{release}
-Obsoletes: pytalloc-devel < 2.1.3
+Obsoletes: pytalloc-devel <= %{version}-%{release}
 %{?python_provide:%python_provide python2-talloc-devel}
 
 %description -n python2-talloc-devel
@@ -81,7 +81,7 @@ Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 %{?python_provide:%python_provide python%{python3_pkgversion}-talloc}
 %if ! %{with_python2}
-Obsoletes:  python2-talloc
+Obsoletes:  python2-talloc <= %{version}-%{release}
 %endif
 
 %description -n python%{python3_pkgversion}-talloc
@@ -92,7 +92,7 @@ Summary: Development libraries for python%{python3_pkgversion}-talloc
 Requires: python%{python3_pkgversion}-talloc = %{version}-%{release}
 %{?python_provide:%python_provide python%{python3_pkgversion}-talloc-devel}
 %if ! %{with_python2}
-Obsoletes:  python2-talloc-devel
+Obsoletes:  python2-talloc-devel <= %{version}-%{release}
 %endif
 
 %description -n python%{python3_pkgversion}-talloc-devel
