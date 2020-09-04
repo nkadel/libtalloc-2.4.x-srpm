@@ -15,18 +15,14 @@
 
 Name: libtalloc
 Version: 2.3.1
-Release: 0%{?dist}
+#Release: 1%%{?dist}
+Release: 0.1%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
 Source: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
 
 # Patches
-
-%if 0%{?rhel} > 0
-# Addresses python36- versus python3- dependencies
-BuildRequires: epel-rpm-macros
-%endif
 
 BuildRequires: gcc
 BuildRequires: libxslt
@@ -35,7 +31,7 @@ BuildRequires: docbook-style-xsl
 BuildRequires: python2-devel
 %endif
 %if %{with_python3}
-BuildRequires: python%{python3_pkgversion}-devel
+BuildRequires: python3-devel
 %endif # with_pythone
 BuildRequires: doxygen
 
@@ -76,27 +72,27 @@ Development libraries for python2-talloc
 %endif # with_python2
 
 %if %{with_python3}
-%package -n python%{python3_pkgversion}-talloc
+%package -n python3-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
-%{?python_provide:%python_provide python%{python3_pkgversion}-talloc}
+%{?python_provide:%python_provide python3-talloc}
 %if ! %{with_python2}
 Obsoletes:  python2-talloc <= %{version}-%{release}
 %endif
 
-%description -n python%{python3_pkgversion}-talloc
+%description -n python3-talloc
 Python 3 libraries for creating bindings using talloc
 
-%package -n python%{python3_pkgversion}-talloc-devel
-Summary: Development libraries for python%{python3_pkgversion}-talloc
-Requires: python%{python3_pkgversion}-talloc = %{version}-%{release}
-%{?python_provide:%python_provide python%{python3_pkgversion}-talloc-devel}
+%package -n python3-talloc-devel
+Summary: Development libraries for python3-talloc
+Requires: python3-talloc = %{version}-%{release}
+%{?python_provide:%python_provide python3-talloc-devel}
 %if ! %{with_python2}
 Obsoletes:  python2-talloc-devel <= %{version}-%{release}
 %endif
 
-%description -n python%{python3_pkgversion}-talloc-devel
-Development libraries for python%{python3_pkgversion}-talloc
+%description -n python3-talloc-devel
+Development libraries for python3-talloc
 %endif # with_python3
 
 %prep
@@ -150,11 +146,11 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif
 
 %if %{with_python3}
-%files -n python%{python3_pkgversion}-talloc
+%files -n python3-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
 
-%files -n python%{python3_pkgversion}-talloc-devel
+%files -n python3-talloc-devel
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
@@ -171,12 +167,16 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %endif
 
 %if %{with_python3}
-#%%ldconfig_scriptlets -n python%{python3_pkgversion}-talloc
-%post -n python%{python3_pkgversion}-talloc -p /sbin/ldconfig
-%postun -n python%{python3_pkgversion}-talloc -p /sbin/ldconfig
+#%%ldconfig_scriptlets -n python3-talloc
+%post -n python3-talloc -p /sbin/ldconfig
+%postun -n python3-talloc -p /sbin/ldconfig
 %endif # with_python3
 
 %changelog
+* Sat Sep 5 2020 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-0.1
+- Discard BuildRequires for epel-rpm-macros
+- Switch to python3 rather than python%%{python3_pkgversion}
+
 * Wed Dec 18 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-0
 - Update to 2.3.1
 
