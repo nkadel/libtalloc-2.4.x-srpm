@@ -1,5 +1,3 @@
-%global with_python3 1
-
 Name: libtalloc
 Version: 2.3.1
 #Release: 1%%{?dist}
