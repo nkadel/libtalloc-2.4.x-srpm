@@ -1,22 +1,9 @@
 %global with_python3 1
 
-# No longer python2 compatible
-%global with_python2 0
-
-%if (%{with_python2} && ! %{with_python3})
-# We need to sent env PYTHON for python2 only build
-%global export_waf_python export PYTHON=%{__python2}
-%endif
-
-%if (%{with_python2} && %{with_python3})
-# python3 is default and therefore python2 need to be set as extra-python
-%global extra_python --extra-python=%{__python2}
-%endif
-
 Name: libtalloc
 Version: 2.3.1
 #Release: 1%%{?dist}
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -27,12 +14,7 @@ Source: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
 BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
-%if %{with_python2}
-BuildRequires: python2-devel
-%endif
-%if %{with_python3}
 BuildRequires: python3-devel
-%endif # with_pythone
 BuildRequires: doxygen
 
 Provides: bundled(libreplace)
@@ -47,38 +29,11 @@ Requires: libtalloc = %{version}-%{release}
 %description devel
 Header files needed to develop programs that link against the Talloc library.
 
-%if %{with_python2}
-%package -n python2-talloc
-Summary: Python bindings for the Talloc library
-Requires: libtalloc = %{version}-%{release}
-Provides: pytalloc%{?_isa} = %{version}-%{release}
-Provides: pytalloc = %{version}-%{release}
-Obsoletes: pytalloc <= %{version}-%{release}
-%{?python_provide:%python_provide python2-talloc}
-
-%description -n python2-talloc
-Python 2 libraries for creating bindings using talloc
-
-%package -n python2-talloc-devel
-Summary: Development libraries for python2-talloc
-Requires: python2-talloc = %{version}-%{release}
-Provides: pytalloc-devel%{?_isa} = %{version}-%{release}
-Provides: pytalloc-devel = %{version}-%{release}
-Obsoletes: pytalloc-devel <= %{version}-%{release}
-%{?python_provide:%python_provide python2-talloc-devel}
-
-%description -n python2-talloc-devel
-Development libraries for python2-talloc
-%endif # with_python2
-
-%if %{with_python3}
 %package -n python3-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 %{?python_provide:%python_provide python3-talloc}
-%if ! %{with_python2}
 Obsoletes:  python2-talloc <= %{version}-%{release}
-%endif
 
 %description -n python3-talloc
 Python 3 libraries for creating bindings using talloc
@@ -87,13 +42,10 @@ Python 3 libraries for creating bindings using talloc
 Summary: Development libraries for python3-talloc
 Requires: python3-talloc = %{version}-%{release}
 %{?python_provide:%python_provide python3-talloc-devel}
-%if ! %{with_python2}
 Obsoletes:  python2-talloc-devel <= %{version}-%{release}
-%endif
 
 %description -n python3-talloc-devel
 Development libraries for python3-talloc
-%endif # with_python3
 
 %prep
 %autosetup -n talloc-%{version} -p1
@@ -134,18 +86,6 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_mandir}/man3/talloc*.3.gz
 %{_mandir}/man3/libtalloc*.3.gz
 
-%if %{with_python2}
-%files -n python2-talloc
-%{_libdir}/libpytalloc-util.so.*
-%{python2_sitearch}/talloc.so
-
-%files -n python2-talloc-devel
-%{_includedir}/pytalloc.h
-%{_libdir}/pkgconfig/pytalloc-util.pc
-%{_libdir}/libpytalloc-util.so
-%endif
-
-%if %{with_python3}
 %files -n python3-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
@@ -154,71 +94,49 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
-%endif
 
 #%%ldconfig_scriptlets
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
-%if %{with_python2}
-#%%ldconfig_scriptlets -n python2-talloc
-%post -n python2-talloc -p /sbin/ldconfig
-%postun -n python2-talloc -p /sbin/ldconfig
-%endif
-
-%if %{with_python3}
 #%%ldconfig_scriptlets -n python3-talloc
 %post -n python3-talloc -p /sbin/ldconfig
 %postun -n python3-talloc -p /sbin/ldconfig
-%endif # with_python3
 
 %changelog
-* Sat Sep 5 2020 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-0.1
-- Discard BuildRequires for epel-rpm-macros
-- Switch to python3 rather than python%%{python3_pkgversion}
+* Sat Jan 16 2021 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-0.2
+- Discard remnants of python2
 
-* Wed Dec 18 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-0
-- Update to 2.3.1
+* Tue Jun 2 2020 Isaac Boukris <iboukris@redhat.com> - 2.3.1-2
+- resolves: rhbz#1817560 - Update to version 2.3.1
 
-* Wed Sep 4 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.0-0
-- Update to 2.3.0
+* Mon Nov 25 2019 Isaac Boukris <iboukris@redhat.com> - 2.2.0-7
+- related: rhbz#1754417 - Fix PY3 symbol names
 
-* Sun Jul 28 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.2.0-0
-- Update to 2.2.0
-- Obsolete python2 packages if python2 disabled
-- Disable python2 entirely
+* Wed Nov 20 2019 Isaac Boukris <iboukris@redhat.com> - 2.2.0-1
+- Resolves: rhbz#1754417 - Rebase talloc to version 2.2.0 for samba
 
-* Sun May 12 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.4
-- Disable python2 building for RHEL 8
+* Tue Apr 30 2019 Jakub Hrozek <jhrozek@redhat.com> - 2.1.16-3
+- Also obsolete python2-libtalloc-debuginfo
+- Resolves: rhbz#1567136 - libtalloc: Drop Python 2 subpackage from RHEL 8
 
-* Thu Apr 25 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.3
-- Update python2/python3 logic to discard python2 for Fedora > 30
+* Tue Apr 30 2019 Jakub Hrozek <jhrozek@redhat.com> - 2.1.16-2
+- Remove python2 libraries on upgrade
+- Resolves: rhbz#1567136 - libtalloc: Drop Python 2 subpackage from RHEL 8
 
-* Mon Apr 15 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.2
-- Add python36 support for RHEL 7
+* Wed Apr  3 2019 Jakub Hrozek <jhrozek@redhat.com> - 2.1.16-1
+- Resolves: rhbz#1684577 - Rebase libtalloc to version 2.1.16 for Samba
+- Resolves: rhbz#1597315 - libtalloc uses Python 2 to build
+- Resolves: rhbz#1567136 - libtalloc: Drop Python 2 subpackage from RHEL 8
 
-* Tue Mar 19 2019 Nico Kadel-Garcia <nkadel@gmail.com> - 2.1.16-0.1
-- Roll back release to avoid rawhide conflicts
-- Include python2/python3 workarounds for Fedora python3 defaults
-- Revert use of ldconfig_scriptlets
-- Simplify with_python logic
+* Tue Sep 18 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-3
+- Resolves: rhbz#1624136 - Review annocheck distro flag failures in libtalloc
 
-* Tue Feb 26 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.16-1
-- rhbz#1683211 - libtalloc-2.1.16 is available
-
-* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.15-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
-
-* Thu Jan 17 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.15-1
-- rhbz#1667471 - libtalloc-2.1.15 is available
-
-* Fri Jul 13 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-2
-- Drop the unneeded ABI hide patch
-- Use pathfix.py instead of a local patch to munge the python path
+* Thu Jul 12 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-2
+- Use pathfix.py to select python2 instead of python
 
 * Thu Jul 12 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-1
 - New upstream release - 2.1.14
-- Apply a patch to hide local ABI symbols to avoid issues with new binutils
 - Patch the waf script to explicitly call python2 as "env python" doesn't
   yield py2 anymore
 
