@@ -3,7 +3,9 @@
 Name: libtalloc
 Version: 2.3.1
 #Release: 1%%{?dist}
-Release: 0.2%{?dist}
+# Mumbered higher thna RHEL 8 incompatible release
+# without python3-libtalloc-devel
+Release: 2.1%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -104,8 +106,10 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %postun -n python3-talloc -p /sbin/ldconfig
 
 %changelog
-* Sat Jan 16 2021 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-0.2
+* Sat Jan 16 2021 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.1-2.1
 - Discard remnants of python2
+- Increment release number to publish python3-talloc-devel,
+  which RHEL 8 decided to leave out to "mark their turf"
 
 * Tue Jun 2 2020 Isaac Boukris <iboukris@redhat.com> - 2.3.1-2
 - resolves: rhbz#1817560 - Update to version 2.3.1
