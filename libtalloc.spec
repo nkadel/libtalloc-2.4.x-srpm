@@ -1,19 +1,24 @@
 Name: libtalloc
 Version: 2.3.2
-#Release: 1%%{?dist}
 Release: 0%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
-Source: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
+
+Source0: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.gz
+Source1: https://www.samba.org/ftp/talloc/talloc-%{version}.tar.asc
+Source2: https://download.samba.org/pub/samba/samba-pubkey.asc#/talloc.keyring
 
 # Patches
+Patch0001: 0003-wafsamba-Fix-few-SyntaxWarnings-caused-by-regular-ex.patch
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
 BuildRequires: python3-devel
 BuildRequires: doxygen
+BuildRequires: gnupg2
 
 Provides: bundled(libreplace)
 
@@ -31,7 +36,6 @@ Header files needed to develop programs that link against the Talloc library.
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
 %{?python_provide:%python_provide python3-talloc}
-Obsoletes:  python2-talloc <= %{version}-%{release}
 
 %description -n python3-talloc
 Python 3 libraries for creating bindings using talloc
@@ -40,7 +44,6 @@ Python 3 libraries for creating bindings using talloc
 Summary: Development libraries for python3-talloc
 Requires: python3-talloc = %{version}-%{release}
 %{?python_provide:%python_provide python3-talloc-devel}
-Obsoletes:  python2-talloc-devel <= %{version}-%{release}
 
 %description -n python3-talloc-devel
 Development libraries for python3-talloc
@@ -49,30 +52,27 @@ Development libraries for python3-talloc
 %autosetup -n talloc-%{version} -p1
 
 %build
+zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 export python_LDFLAGS=""
 
-%{?export_waf_python}
 %configure --disable-rpath \
            --disable-rpath-install \
            --bundled-libraries=NONE \
            --builtin-libraries=replace \
-           --disable-silent-rules \
-           %{?extra_python}
+           --disable-silent-rules
 
-make %{?_smp_mflags} V=1
+%make_build
 doxygen doxy.config
 
 %check
-%{?export_waf_python}
-make %{?_smp_mflags} check
+%make_build check
 
 %install
-%{?export_waf_python}
-make install DESTDIR=$RPM_BUILD_ROOT
+%make_install
 
 # Install API docs
-cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
+cp -a doc/man/man3 %{buildroot}%{_mandir}
 
 %files
 %{_libdir}/libtalloc.so.*
@@ -81,9 +81,10 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_includedir}/talloc.h
 %{_libdir}/libtalloc.so
 %{_libdir}/pkgconfig/talloc.pc
-%{_mandir}/man3/talloc*.3.gz
-%{_mandir}/man3/libtalloc*.3.gz
+%{_mandir}/man3/talloc*.3*
+%{_mandir}/man3/libtalloc*.3*
 
+%if %{with python3}
 %files -n python3-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
@@ -92,49 +93,73 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
+%endif
 
-#%%ldconfig_scriptlets
-%post -p /sbin/ldconfig
-%postun -p /sbin/ldconfig
+%ldconfig_scriptlets
 
-#%%ldconfig_scriptlets -n python3-talloc
-%post -n python3-talloc -p /sbin/ldconfig
-%postun -n python3-talloc -p /sbin/ldconfig
+%if %{with python3}
+%ldconfig_scriptlets -n python3-talloc
+%endif
 
 %changelog
-* Sat Jan 16 2021 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.2-0
-- Discard remnants of python2
+* Mon Jan 25 2021 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.2-1
+- libtalloc-2.3.2 is available
 
-* Tue Jun 2 2020 Isaac Boukris <iboukris@redhat.com> - 2.3.1-2
-- resolves: rhbz#1817560 - Update to version 2.3.1
+* Thu Oct 22 2020 Andreas Schneider <asn@redhat.com> - 2.3.1-6
+- Spec file cleanup and improvements
 
-* Mon Nov 25 2019 Isaac Boukris <iboukris@redhat.com> - 2.2.0-7
-- related: rhbz#1754417 - Fix PY3 symbol names
+* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
-* Wed Nov 20 2019 Isaac Boukris <iboukris@redhat.com> - 2.2.0-1
-- Resolves: rhbz#1754417 - Rebase talloc to version 2.2.0 for samba
+* Mon Jul 13 2020 Tom Stellard <tstellar@redhat.com> - 2.3.1-4
+- Use make macros
+- https://fedoraproject.org/wiki/Changes/UseMakeBuildInstallMacro
 
-* Tue Apr 30 2019 Jakub Hrozek <jhrozek@redhat.com> - 2.1.16-3
-- Also obsolete python2-libtalloc-debuginfo
-- Resolves: rhbz#1567136 - libtalloc: Drop Python 2 subpackage from RHEL 8
+* Tue May 26 2020 Miro Hrončok <mhroncok@redhat.com> - 2.3.1-3
+- Rebuilt for Python 3.9
 
-* Tue Apr 30 2019 Jakub Hrozek <jhrozek@redhat.com> - 2.1.16-2
-- Remove python2 libraries on upgrade
-- Resolves: rhbz#1567136 - libtalloc: Drop Python 2 subpackage from RHEL 8
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
 
-* Wed Apr  3 2019 Jakub Hrozek <jhrozek@redhat.com> - 2.1.16-1
-- Resolves: rhbz#1684577 - Rebase libtalloc to version 2.1.16 for Samba
-- Resolves: rhbz#1597315 - libtalloc uses Python 2 to build
-- Resolves: rhbz#1567136 - libtalloc: Drop Python 2 subpackage from RHEL 8
+* Wed Jan 22 2020 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.1-1
+- rhbz#1748815 - libtalloc-2.3.1 is available
 
-* Tue Sep 18 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-3
-- Resolves: rhbz#1624136 - Review annocheck distro flag failures in libtalloc
+* Wed Sep 11 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.0-1
+- rhbz#1748815 - libtalloc-2.3.0 is available
 
-* Thu Jul 12 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-2
-- Use pathfix.py to select python2 instead of python
+* Mon Aug 26 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.2.0-1
+- rhbz#1691297 - libtalloc-2.2.0 is available
+- rhbz#1737644 - libldb, libtalloc, libtevent, libtdb: Remove Python 2 subpackages from Fedora 31+
+
+* Mon Aug 19 2019 Miro Hrončok <mhroncok@redhat.com> - 2.1.16-5
+- Rebuilt for Python 3.8
+
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.16-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
+* Fri Jun 14 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.16-3
+- rhbz#1718113 - samba fail to build with Python 3.8
+  AttributeError: module 'time' has no attribute 'clock'
+
+* Mon Jun 03 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.16-2
+- rhbz#1711638 - fails to build with Python 3.8.0a4
+
+* Tue Feb 26 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.16-1
+- rhbz#1683211 - libtalloc-2.1.16 is available
+
+* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 2.1.15-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+
+* Thu Jan 17 2019 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.1.15-1
+- rhbz#1667471 - libtalloc-2.1.15 is available
+
+* Fri Jul 13 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-2
+- Drop the unneeded ABI hide patch
+- Use pathfix.py instead of a local patch to munge the python path
 
 * Thu Jul 12 2018 Jakub Hrozek <jhrozek@redhat.com> - 2.1.14-1
 - New upstream release - 2.1.14
+- Apply a patch to hide local ABI symbols to avoid issues with new binutils
 - Patch the waf script to explicitly call python2 as "env python" doesn't
   yield py2 anymore
 
