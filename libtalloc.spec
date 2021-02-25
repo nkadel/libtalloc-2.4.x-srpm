@@ -1,6 +1,6 @@
 Name: libtalloc
 Version: 2.3.2
-Release: 0%{?dist}
+Release: 0.1%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -84,7 +84,6 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %{_mandir}/man3/talloc*.3*
 %{_mandir}/man3/libtalloc*.3*
 
-%if %{with python3}
 %files -n python3-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
@@ -93,13 +92,10 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
-%endif
 
 %ldconfig_scriptlets
 
-%if %{with python3}
 %ldconfig_scriptlets -n python3-talloc
-%endif
 
 %changelog
 * Mon Jan 25 2021 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.2-1
