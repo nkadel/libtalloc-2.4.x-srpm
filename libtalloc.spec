@@ -98,6 +98,9 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %ldconfig_scriptlets -n python3-talloc
 
 %changelog
+* Thu Feb 25 2021 Nico Kaadel-Garcia <nkadel@gmai.com> - 2.3.2-0.1
+- Discard %%{with python3} logic, python3 is now always supported
+
 * Mon Jan 25 2021 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.2-1
 - libtalloc-2.3.2 is available
 
