@@ -1,6 +1,7 @@
 Name: libtalloc
 Version: 2.3.2
-Release: 0%{?dist}
+#Release: 5%{?dist}
+Release: 0.5%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -12,7 +13,6 @@ Source2: https://download.samba.org/pub/samba/samba-pubkey.asc#/talloc.keyring
 # Patches
 Patch0001: 0003-wafsamba-Fix-few-SyntaxWarnings-caused-by-regular-ex.patch
 
-BuildRequires: make
 BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
@@ -21,6 +21,8 @@ BuildRequires: doxygen
 BuildRequires: gnupg2
 
 Provides: bundled(libreplace)
+Obsoletes: python2-talloc < 2.2.0-1
+Obsoletes: python2-talloc-devel < 2.2.0-1
 
 %description
 A library that implements a hierarchical allocator with destructors.
@@ -72,7 +74,7 @@ doxygen doxy.config
 %make_install
 
 # Install API docs
-cp -a doc/man/man3 %{buildroot}%{_mandir}
+cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 
 %files
 %{_libdir}/libtalloc.so.*
@@ -84,7 +86,6 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %{_mandir}/man3/talloc*.3*
 %{_mandir}/man3/libtalloc*.3*
 
-%if %{with python3}
 %files -n python3-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
@@ -93,21 +94,12 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
-%endif
 
 %ldconfig_scriptlets
 
-%if %{with python3}
 %ldconfig_scriptlets -n python3-talloc
-%endif
 
 %changelog
-* Mon Jan 25 2021 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.2-1
-- libtalloc-2.3.2 is available
-
-* Thu Oct 22 2020 Andreas Schneider <asn@redhat.com> - 2.3.1-6
-- Spec file cleanup and improvements
-
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
