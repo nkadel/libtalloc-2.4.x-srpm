@@ -1,6 +1,6 @@
 Name: libtalloc
 Version: 2.3.2
-#Release: 5%{?dist}
+#Release: 5%%{?dist}
 Release: 0.5%{?dist}
 Summary: The talloc library
 License: LGPLv3+
