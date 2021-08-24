@@ -1,7 +1,9 @@
+%bcond_without python3
+
 Name: libtalloc
-Version: 2.3.2
-#Release: 5%%{?dist}
-Release: 0.5%{?dist}
+Version: 2.3.3
+#Release: 2%%{?dist}
+Release: 0.2%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -13,10 +15,13 @@ Source2: https://download.samba.org/pub/samba/samba-pubkey.asc#/talloc.keyring
 # Patches
 Patch0001: 0003-wafsamba-Fix-few-SyntaxWarnings-caused-by-regular-ex.patch
 
+BuildRequires: make
 BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
+%if %{with python3}
 BuildRequires: python3-devel
+%endif
 BuildRequires: doxygen
 BuildRequires: gnupg2
 
@@ -34,6 +39,7 @@ Requires: libtalloc = %{version}-%{release}
 %description devel
 Header files needed to develop programs that link against the Talloc library.
 
+%if %{with python3}
 %package -n python3-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
@@ -49,6 +55,7 @@ Requires: python3-talloc = %{version}-%{release}
 
 %description -n python3-talloc-devel
 Development libraries for python3-talloc
+%endif
 
 %prep
 %autosetup -n talloc-%{version} -p1
@@ -74,7 +81,7 @@ doxygen doxy.config
 %make_install
 
 # Install API docs
-cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
+cp -a doc/man/man3 %{buildroot}%{_mandir}
 
 %files
 %{_libdir}/libtalloc.so.*
@@ -86,6 +93,7 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_mandir}/man3/talloc*.3*
 %{_mandir}/man3/libtalloc*.3*
 
+%if %{with python3}
 %files -n python3-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
@@ -94,12 +102,33 @@ cp -a doc/man/* $RPM_BUILD_ROOT/%{_mandir}
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
+%endif
 
 %ldconfig_scriptlets
 
+%if %{with python3}
 %ldconfig_scriptlets -n python3-talloc
+%endif
 
 %changelog
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Guenther Deschner <gdeschne@redhat.com> - 2.3.3-1
+- rhbz#1982578 - libtalloc-2.3.3 is available
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.3.2-3
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
+
+* Mon Jan 25 2021 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.2-1
+- libtalloc-2.3.2 is available
+
+* Thu Oct 22 2020 Andreas Schneider <asn@redhat.com> - 2.3.1-6
+- Spec file cleanup and improvements
+
 * Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.1-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
 
