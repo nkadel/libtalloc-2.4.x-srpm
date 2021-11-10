@@ -20,7 +20,7 @@ BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
 %if %{with python3}
-BuildRequires: python3-devel
+BuildRequires: python%{python3_pkgversion}-devel
 %endif
 BuildRequires: doxygen
 BuildRequires: gnupg2
@@ -40,21 +40,21 @@ Requires: libtalloc = %{version}-%{release}
 Header files needed to develop programs that link against the Talloc library.
 
 %if %{with python3}
-%package -n python3-talloc
+%package -n python%{python3_pkgversion}-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
-%{?python_provide:%python_provide python3-talloc}
+%{?python_provide:%python_provide python%{python3_pkgversion}-talloc}
 
-%description -n python3-talloc
+%description -n python%{python3_pkgversion}-talloc
 Python 3 libraries for creating bindings using talloc
 
-%package -n python3-talloc-devel
-Summary: Development libraries for python3-talloc
-Requires: python3-talloc = %{version}-%{release}
-%{?python_provide:%python_provide python3-talloc-devel}
+%package -n python%{python3_pkgversion}-talloc-devel
+Summary: Development libraries for python%{python3_pkgversion}-talloc
+Requires: python%{python3_pkgversion}-talloc = %{version}-%{release}
+%{?python_provide:%python_provide python%{python3_pkgversion}-talloc-devel}
 
-%description -n python3-talloc-devel
-Development libraries for python3-talloc
+%description -n python%{python3_pkgversion}-talloc-devel
+Development libraries for python%{python3_pkgversion}-talloc
 %endif
 
 %prep
@@ -94,11 +94,11 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %{_mandir}/man3/libtalloc*.3*
 
 %if %{with python3}
-%files -n python3-talloc
+%files -n python%{python3_pkgversion}-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
 
-%files -n python3-talloc-devel
+%files -n python%{python3_pkgversion}-talloc-devel
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
@@ -107,7 +107,7 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %ldconfig_scriptlets
 
 %if %{with python3}
-%ldconfig_scriptlets -n python3-talloc
+%ldconfig_scriptlets -n python%{python3_pkgversion}-talloc
 %endif
 
 %changelog
