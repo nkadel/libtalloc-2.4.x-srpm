@@ -1,6 +1,9 @@
+%bcond_without python3
+
 Name: libtalloc
-Version: 2.3.2
-Release: 0.1%{?dist}
+Version: 2.3.3
+#Release: 2%%{?dist}
+Release: 0.2%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -16,11 +19,15 @@ BuildRequires: make
 BuildRequires: gcc
 BuildRequires: libxslt
 BuildRequires: docbook-style-xsl
-BuildRequires: python3-devel
+%if %{with python3}
+BuildRequires: python%{python3_pkgversion}-devel
+%endif
 BuildRequires: doxygen
 BuildRequires: gnupg2
 
 Provides: bundled(libreplace)
+Obsoletes: python2-talloc < 2.2.0-1
+Obsoletes: python2-talloc-devel < 2.2.0-1
 
 %description
 A library that implements a hierarchical allocator with destructors.
@@ -32,21 +39,23 @@ Requires: libtalloc = %{version}-%{release}
 %description devel
 Header files needed to develop programs that link against the Talloc library.
 
-%package -n python3-talloc
+%if %{with python3}
+%package -n python%{python3_pkgversion}-talloc
 Summary: Python bindings for the Talloc library
 Requires: libtalloc = %{version}-%{release}
-%{?python_provide:%python_provide python3-talloc}
+%{?python_provide:%python_provide python%{python3_pkgversion}-talloc}
 
-%description -n python3-talloc
+%description -n python%{python3_pkgversion}-talloc
 Python 3 libraries for creating bindings using talloc
 
-%package -n python3-talloc-devel
-Summary: Development libraries for python3-talloc
-Requires: python3-talloc = %{version}-%{release}
-%{?python_provide:%python_provide python3-talloc-devel}
+%package -n python%{python3_pkgversion}-talloc-devel
+Summary: Development libraries for python%{python3_pkgversion}-talloc
+Requires: python%{python3_pkgversion}-talloc = %{version}-%{release}
+%{?python_provide:%python_provide python%{python3_pkgversion}-talloc-devel}
 
-%description -n python3-talloc-devel
-Development libraries for python3-talloc
+%description -n python%{python3_pkgversion}-talloc-devel
+Development libraries for python%{python3_pkgversion}-talloc
+%endif
 
 %prep
 %autosetup -n talloc-%{version} -p1
@@ -84,22 +93,35 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %{_mandir}/man3/talloc*.3*
 %{_mandir}/man3/libtalloc*.3*
 
-%files -n python3-talloc
+%if %{with python3}
+%files -n python%{python3_pkgversion}-talloc
 %{_libdir}/libpytalloc-util.cpython*.so.*
 %{python3_sitearch}/talloc.cpython*.so
 
-%files -n python3-talloc-devel
+%files -n python%{python3_pkgversion}-talloc-devel
 %{_includedir}/pytalloc.h
 %{_libdir}/pkgconfig/pytalloc-util.cpython-*.pc
 %{_libdir}/libpytalloc-util.cpython*.so
+%endif
 
 %ldconfig_scriptlets
 
-%ldconfig_scriptlets -n python3-talloc
+%if %{with python3}
+%ldconfig_scriptlets -n python%{python3_pkgversion}-talloc
+%endif
 
 %changelog
-* Thu Feb 25 2021 Nico Kaadel-Garcia <nkadel@gmai.com> - 2.3.2-0.1
-- Discard %%{with python3} logic, python3 is now always supported
+* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.3-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
+
+* Thu Jul 15 2021 Guenther Deschner <gdeschne@redhat.com> - 2.3.3-1
+- rhbz#1982578 - libtalloc-2.3.3 is available
+
+* Fri Jun 04 2021 Python Maint <python-maint@redhat.com> - 2.3.2-3
+- Rebuilt for Python 3.10
+
+* Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
 * Mon Jan 25 2021 Lukas Slebodnik <lslebodn@fedoraproject.org> - 2.3.2-1
 - libtalloc-2.3.2 is available
