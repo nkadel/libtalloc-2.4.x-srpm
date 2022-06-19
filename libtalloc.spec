@@ -1,9 +1,8 @@
 %bcond_without python3
 
 Name: libtalloc
-Version: 2.3.3
-#Release: 2%%{?dist}
-Release: 0.2%{?dist}
+Version: 2.3.4
+Release: 0.1%{?dist}
 Summary: The talloc library
 License: LGPLv3+
 URL: https://talloc.samba.org/
@@ -111,6 +110,9 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %endif
 
 %changelog
+* Thu Jun 16 2022 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.4-0.1
+- Update to 2.3.4
+
 * Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 2.3.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
 
