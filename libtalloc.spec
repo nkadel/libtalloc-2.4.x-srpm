@@ -1,7 +1,7 @@
 %bcond_without python3
 
 Name: libtalloc
-Version: 2.3.4
+Version: 2.4.0
 Release: 0.1%{?dist}
 Summary: The talloc library
 License: LGPLv3+
@@ -12,7 +12,6 @@ Source1: https://download.samba.org/pub/talloc/talloc-%{version}.tar.asc
 Source2: https://download.samba.org/pub/samba/samba-pubkey.asc#/talloc.keyring
 
 # Patches
-Patch0001: 0003-wafsamba-Fix-few-SyntaxWarnings-caused-by-regular-ex.patch
 
 BuildRequires: make
 BuildRequires: gcc
@@ -60,7 +59,9 @@ Development libraries for python%{python3_pkgversion}-talloc
 %autosetup -n talloc-%{version} -p1
 
 %build
-zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
+# STOP DOING THIS!!! It sucks up build time pointlessly
+#zcat %{SOURCE0} | gpgv2 --quiet --keyring %{SOURCE2} %{SOURCE1} -
+
 # workaround for https://bugzilla.redhat.com/show_bug.cgi?id=1217376
 export python_LDFLAGS=""
 
@@ -110,6 +111,11 @@ cp -a doc/man/man3 %{buildroot}%{_mandir}
 %endif
 
 %changelog
+* Thu Jan 19 2023 Nico Kadel-Garcia <nkadel@gmail.com> - 2.4.0-0.1
+- Update to 2.4.0
+- Discard obsolete patches
+- Stop doing gpg check of tarball, complete waste of compilation time
+
 * Thu Jun 16 2022 Nico Kadel-Garcia <nkadel@gmail.com> - 2.3.4-0.1
 - Update to 2.3.4
 
